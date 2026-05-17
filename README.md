@@ -129,6 +129,31 @@ Before inference, CodeMate automatically enriches the prompt with **web-sourced 
 
 ## 🏗 Architecture
 
+```mermaid
+graph TD
+    CM["Win32 Native\nWM_CLIPBOARDUPDATE Hook"] --> FB["Floating Bubble\n(appears at cursor)"]
+
+    subgraph UI["UI Layer (PySide6)"]
+        FB -->|click| RP["Response Popup\nFormatted AI analysis + copy"]
+        DASH["Dashboard\nGauges · Activity · Settings"]
+        TRAY["System Tray"]
+    end
+
+    subgraph Core["Core Engine"]
+        CE["Context Enricher\nWikipedia + StackOverflow\n(parallel · 300 token cap)"] --> ME
+        ME["Model Engine (QThread)\nLocal: Qwen2.5-Coder-1.5B + QLoRA\nAPI: Gemini Flash"]
+        GPU["GPU Detector\nNVIDIA→CUDA · AMD→ROCm · CPU"]
+        GPU --- ME
+    end
+
+    FB --> CE
+    ME --> RP
+    SYS["System Monitor\npsutil + pynvml"] --> DASH
+```
+
+<details>
+<summary>ASCII fallback (click to expand)</summary>
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                    CodeMate Desktop App                         │
@@ -142,7 +167,7 @@ Before inference, CodeMate automatically enriches the prompt with **web-sourced 
 │  │ UPDATE hook   │    │  └─────┬──────┘  │    activity,   │  │  │
 │  └───────────────┘    │        │click    │    settings)   │  │  │
 │                       │  ┌─────▼──────┐  └────────────────┘  │  │
-│                       │  │  Respons   │  ┌───────────────┐   │  │
+│                       │  │  Response  │  ┌───────────────┐   │  │
 │                       │  │  Popup     │  │  System Tray  │   │  │
 │                       │  └────────────┘  └───────────────┘   │  │
 │                       └──────────────────────────────────────┘  │
@@ -171,7 +196,26 @@ Before inference, CodeMate automatically enriches the prompt with **web-sourced 
 └─────────────────────────────────────────────────────────────────┘
 ```
 
+</details>
+
 ### Pipeline Flow
+
+```mermaid
+flowchart TD
+    A["Copy code"] --> B["Clipboard Monitor\n14 regex patterns detect code"]
+    B --> C["Floating Bubble appears at cursor\nUser clicks"]
+    C --> D["Context Enricher (background QThread)\n1. Extract identifiers\n2. Group into batches\n3. Query Wikipedia + StackOverflow\n4. Assemble context (≤300 tokens)"]
+    D --> E["Model Engine (background QThread)"]
+    E --> F{Backend?}
+    F -->|Local| G["Qwen2.5-Coder-1.5B + QLoRA\ntorch inference"]
+    F -->|API| H["Gemini Flash"]
+    G --> I["Response Popup\nUser copies result"]
+    H --> I
+    I --> J["Full pipeline logged to log.txt"]
+```
+
+<details>
+<summary>ASCII fallback (click to expand)</summary>
 
 ```
 Copy code → Clipboard Monitor detects code (14 regex patterns)
@@ -197,6 +241,8 @@ Response Popup → User copies result
      ▼
 Full pipeline logged to log.txt
 ```
+
+</details>
 
 ---
 
