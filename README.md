@@ -33,6 +33,8 @@
 - [Project Structure](#project-structure)
 - [Dependencies](#dependencies)
 - [Configuration](#configuration)
+- [Troubleshooting](#troubleshooting)
+- [Project Roadmap](#project-roadmap)
 - [Future Improvement Ideas](#future-improvement-ideas)
 - [Author](#author)
 
@@ -366,6 +368,53 @@ Settings are managed in [config.py](codemate_app/config.py):
 - **Context**: 300-token cap, 5-second query timeouts, 2 sentences per Wikipedia search.
 - **API**: Default fallback model `gemini-2.5-flash` with 8192 output cap.
 - **UI**: 6s bubble timeout, 56px bubble size, 900x620 dashboard window size, and 1s telemetry refresh rate.
+
+---
+
+## Troubleshooting
+
+### 1. Model Loading / CUDA Issues (NVIDIA GPUs)
+* **Symptom**: Console prints fallback to CPU even though an NVIDIA GPU is installed.
+* **Resolution**: 
+  - Ensure you have the CUDA-enabled version of PyTorch installed. Run `python -c "import torch; print(torch.cuda.is_available())"`. If it returns `False`, reinstall PyTorch with CUDA support:
+    ```bash
+    pip uninstall torch torchvision torchaudio
+    pip install torch --index-url https://download.pytorch.org/whl/cu121
+    ```
+  - Ensure the CUDA Toolkit (v11.8 or v12.x) is installed and added to your system `PATH`.
+
+### 2. BitsAndBytes Serialization Error on Windows
+* **Symptom**: `ImportError: DLL load failed` or failure to load `bitsandbytes` in 4-bit mode.
+* **Resolution**:
+  - The default `bitsandbytes` library has limited native support for Windows. Install the Windows-compatible wheel:
+    ```bash
+    pip install bitsandbytes --index-url https://jllllll.github.io/bitsandbytes-windows-webui
+    ```
+
+### 3. Clipboard Listener Conflicts
+* **Symptom**: The floating bubble does not trigger when copying code.
+* **Resolution**:
+  - Another clipboard utility or password manager might have exclusive access to the Windows Clipboard. CodeMate automatically falls back to polling if the Win32 hook fails, but you can restart the application to re-register the clipboard format listener hook.
+
+### 4. Downloading Model Times Out
+* **Symptom**: HuggingFace connection issues or timeouts during first launch.
+* **Resolution**:
+  - Ensure you have a stable internet connection. If needed, download the model files manually or set the HuggingFace mirror environment variable before launching:
+    ```cmd
+    set HF_ENDPOINT=https://hf-mirror.com
+    python main.py
+    ```
+
+---
+
+## Project Roadmap
+
+| Phase | Target Timeline | Milestone / Focus | Status |
+| :--- | :--- | :--- | :--- |
+| **Phase 1: Foundation** | Q1 2026 | Clipboard hook listener, local LLM integration, basic PySide6 dashboard. | **Completed** |
+| **Phase 2: Context and API** | Q2 2026 | Parallel search crawler (Wikipedia/StackOverflow), Gemini Flash fallback, custom QLoRA adapter training. | **Completed** |
+| **Phase 3: Refinement** | Q3 2026 | Token-by-token response streaming, QSyntaxHighlighter styling in popups, cross-language regex expansion. | **In Progress** |
+| **Phase 4: Advanced Features** | Q4 2026 | OCR screenshots (Image-to-Code), multi-turn chat panels, and system-wide hotkeys. | **Planned** |
 
 ---
 
