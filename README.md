@@ -404,6 +404,27 @@ Settings are managed in [config.py](codemate_app/config.py):
     python main.py
     ```
 
+### 5. Slow Inference / High Latency on CPU
+* **Symptom**: Model takes 30+ seconds to respond when running in CPU fallback mode.
+* **Resolution**:
+  - Qwen2.5-Coder-1.5B is highly efficient, but CPU inference is resource-constrained. For smooth, sub-second responses, switch to **API Mode** in settings and enter a Gemini API key.
+  - If you must run locally on CPU, close high-memory background applications and ensure PyTorch uses all physical cores by setting the thread count environment variable:
+    ```cmd
+    set OMP_NUM_THREADS=4  :: Replace 4 with your physical CPU core count
+    ```
+
+### 6. AMD GPU Detection and ROCm Support
+* **Symptom**: CodeMate runs on CPU even though an AMD GPU is installed.
+* **Resolution**:
+  - AMD ROCm has limited official support on Windows. CodeMate tries to detect AMD hardware using WMI queries.
+  - To enable ROCm acceleration on Windows, you must run PyTorch inside the Windows Subsystem for Linux (WSL2) with a ROCm-compatible environment, or rely on CPU/API fallback options for the native Windows app.
+
+### 7. Telemetry Gauges Not Updating
+* **Symptom**: GPU temperature or VRAM usage displays as `N/A` or fails to update in the dashboard.
+* **Resolution**:
+  - The system monitor utilizes `pynvml` to retrieve NVIDIA GPU stats. Ensure you have the latest NVIDIA drivers installed.
+  - For AMD GPUs, ensure that the card is recognized in Windows Device Manager. Some AMD driver versions do not expose performance metrics via WMI, leading to empty dashboard readings.
+
 ---
 
 ## Future Improvement Ideas
