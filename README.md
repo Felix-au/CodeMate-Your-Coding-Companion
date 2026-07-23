@@ -34,7 +34,6 @@
 - [Dependencies](#dependencies)
 - [Configuration](#configuration)
 - [Troubleshooting](#troubleshooting)
-- [Project Roadmap](#project-roadmap)
 - [Future Improvement Ideas](#future-improvement-ideas)
 - [Author](#author)
 
@@ -404,17 +403,6 @@ Settings are managed in [config.py](codemate_app/config.py):
     set HF_ENDPOINT=https://hf-mirror.com
     python main.py
     ```
-
----
-
-## Project Roadmap
-
-| Phase | Target Timeline | Milestone / Focus | Status |
-| :--- | :--- | :--- | :--- |
-| **Phase 1: Foundation** | Q1 2026 | Clipboard hook listener, local LLM integration, basic PySide6 dashboard. | **Completed** |
-| **Phase 2: Context and API** | Q2 2026 | Parallel search crawler (Wikipedia/StackOverflow), Gemini Flash fallback, custom QLoRA adapter training. | **Completed** |
-| **Phase 3: Refinement** | Q3 2026 | Token-by-token response streaming, QSyntaxHighlighter styling in popups, cross-language regex expansion. | **In Progress** |
-| **Phase 4: Advanced Features** | Q4 2026 | OCR screenshots (Image-to-Code), multi-turn chat panels, and system-wide hotkeys. | **Planned** |
 
 ---
 
